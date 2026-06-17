@@ -76,23 +76,57 @@ export async function deleteProject(id: number) {
   revalidatePath("/");
 }
 
+const VALID_PRIORITIES = new Set(["urgent", "high", "medium", "low"]);
+
+/**
+ * Parses one pasted line into a project. Supports an optional pipe-delimited
+ * format so priority/cost/area can be set on import:
+ *
+ *   Title | priority | cost | area
+ *
+ * Only the title is required; any trailing fields can be omitted or left blank
+ * (e.g. `Fix gutters | high` or `Fix gutters | | 2500`). A plain title with no
+ * pipes still works and defaults to medium priority.
+ */
+function parseImportLine(line: string) {
+  const [titlePart, priorityPart, costPart, areaPart] = line
+    .split("|")
+    .map((p) => p.trim());
+
+  const title = titlePart;
+  if (!title) return null;
+
+  const priority = VALID_PRIORITIES.has((priorityPart ?? "").toLowerCase())
+    ? priorityPart.toLowerCase()
+    : "medium";
+
+  const costDigits = (costPart ?? "").replace(/[^0-9]/g, "");
+  const estimatedCost = costDigits ? parseInt(costDigits, 10) : null;
+
+  const area = areaPart ? areaPart : null;
+
+  return {
+    title,
+    area,
+    source: "inspection" as const,
+    priority,
+    status: "not_started" as const,
+    estimatedCost,
+  };
+}
+
 export async function importInspectionItems(formData: FormData) {
   const db = getDb();
   const raw = String(formData.get("items") ?? "");
-  const titles = raw
+  const rows = raw
     .split("\n")
     .map((line) => line.trim())
-    .filter((line) => line.length > 0);
-  if (titles.length === 0) return;
+    .filter((line) => line.length > 0)
+    .map(parseImportLine)
+    .filter((row): row is NonNullable<typeof row> => row !== null);
+  if (rows.length === 0) return;
 
-  await db.insert(improvementProjects).values(
-    titles.map((title) => ({
-      title,
-      source: "inspection",
-      priority: "medium",
-      status: "not_started",
-    })),
-  );
+  await db.insert(improvementProjects).values(rows);
   revalidatePath("/improvements");
   revalidatePath("/");
 }
