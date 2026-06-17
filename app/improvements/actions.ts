@@ -69,6 +69,32 @@ export async function updateProjectPriority(id: number, priority: string) {
   revalidatePath("/");
 }
 
+export async function updateProject(formData: FormData) {
+  const db = getDb();
+  const id = parseIntOrNull(formData.get("id"));
+  if (id == null) return;
+
+  const title = String(formData.get("title") ?? "").trim();
+  if (!title) return;
+
+  await db
+    .update(improvementProjects)
+    .set({
+      title,
+      description: String(formData.get("description") ?? "").trim() || null,
+      area: String(formData.get("area") ?? "").trim() || null,
+      priority: String(formData.get("priority") ?? "medium").trim() || "medium",
+      status: String(formData.get("status") ?? "not_started").trim() || "not_started",
+      estimatedCost: parseIntOrNull(formData.get("estimatedCost")),
+      estimatedHours: parseIntOrNull(formData.get("estimatedHours")),
+      targetDate: String(formData.get("targetDate") ?? "").trim() || null,
+      updatedAt: new Date(),
+    })
+    .where(eq(improvementProjects.id, id));
+  revalidatePath("/improvements");
+  revalidatePath("/");
+}
+
 export async function deleteProject(id: number) {
   const db = getDb();
   await db.delete(improvementProjects).where(eq(improvementProjects.id, id));

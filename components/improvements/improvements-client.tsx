@@ -7,6 +7,7 @@ import { formatDate, formatMoney, cn } from "@/lib/utils";
 import {
   addProject,
   importInspectionItems,
+  updateProject,
   updateProjectStatus,
   updateProjectPriority,
   deleteProject,
@@ -305,7 +306,103 @@ export function ImprovementsClient({ projects }: { projects: ImprovementProject[
 
 function ProjectRow({ project }: { project: ImprovementProject }) {
   const [, startTransition] = useTransition();
+  const [isEditing, setIsEditing] = useState(false);
   const calUrl = googleCalendarUrl(project);
+
+  if (isEditing) {
+    return (
+      <div className="p-4">
+        <form
+          action={async (fd) => {
+            await updateProject(fd);
+            setIsEditing(false);
+          }}
+          className="grid gap-3 sm:grid-cols-2"
+        >
+          <input type="hidden" name="id" value={project.id} />
+          <input
+            name="title"
+            required
+            defaultValue={project.title}
+            placeholder="Project title"
+            className="rounded-lg border border-border px-3 py-2 text-sm sm:col-span-2"
+          />
+          <input
+            name="area"
+            defaultValue={project.area ?? ""}
+            placeholder="Area (e.g. Kitchen, Roof, Basement)"
+            className="rounded-lg border border-border px-3 py-2 text-sm"
+          />
+          <select
+            name="priority"
+            defaultValue={project.priority}
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm capitalize"
+          >
+            {PRIORITIES.map((p) => (
+              <option key={p} value={p}>
+                {p} priority
+              </option>
+            ))}
+          </select>
+          <select
+            name="status"
+            defaultValue={project.status}
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
+          >
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {STATUS_LABELS[s]}
+              </option>
+            ))}
+          </select>
+          <input
+            name="targetDate"
+            type="date"
+            defaultValue={project.targetDate ?? ""}
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
+          />
+          <input
+            name="estimatedCost"
+            type="number"
+            min="0"
+            defaultValue={project.estimatedCost ?? ""}
+            placeholder="Estimated cost ($)"
+            className="rounded-lg border border-border px-3 py-2 text-sm"
+          />
+          <input
+            name="estimatedHours"
+            type="number"
+            min="0"
+            defaultValue={project.estimatedHours ?? ""}
+            placeholder="Estimated hours"
+            className="rounded-lg border border-border px-3 py-2 text-sm"
+          />
+          <textarea
+            name="description"
+            defaultValue={project.description ?? ""}
+            placeholder="Description / notes"
+            rows={3}
+            className="rounded-lg border border-border px-3 py-2 text-sm sm:col-span-2"
+          />
+          <div className="flex gap-2 sm:col-span-2">
+            <button
+              type="submit"
+              className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              Save changes
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="rounded-lg border border-border bg-card px-4 py-2 text-sm hover:bg-black/5"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-start gap-3 p-4">
@@ -388,14 +485,24 @@ function ProjectRow({ project }: { project: ImprovementProject }) {
         </div>
       </div>
 
-      <button
-        onClick={() => startTransition(() => deleteProject(project.id))}
-        className="shrink-0 rounded-lg p-1.5 text-muted hover:bg-black/5 hover:text-red-600"
-        aria-label="Delete project"
-        title="Delete project"
-      >
-        ✕
-      </button>
+      <div className="flex shrink-0 items-center gap-1">
+        <button
+          onClick={() => setIsEditing(true)}
+          className="rounded-lg p-1.5 text-muted hover:bg-black/5 hover:text-accent"
+          aria-label="Edit project"
+          title="Edit project"
+        >
+          ✏️
+        </button>
+        <button
+          onClick={() => startTransition(() => deleteProject(project.id))}
+          className="rounded-lg p-1.5 text-muted hover:bg-black/5 hover:text-red-600"
+          aria-label="Delete project"
+          title="Delete project"
+        >
+          ✕
+        </button>
+      </div>
     </div>
   );
 }
