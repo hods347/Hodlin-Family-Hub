@@ -1,4 +1,4 @@
-import { PageHeader, DbNotConfigured } from "@/components/ui";
+import { PageHeader, DbNotConfigured, DbError } from "@/components/ui";
 import { isDbConfigured } from "@/lib/db";
 import { MealsClient } from "@/components/meals/meals-client";
 import { getMeals, getWeekPlan } from "./actions";
@@ -27,7 +27,20 @@ export default async function MealsPage() {
   }
 
   const weekStartISO = toISODate(new Date());
-  const [meals, weekPlan] = await Promise.all([getMeals(), getWeekPlan(weekStartISO)]);
+  let meals, weekPlan;
+  try {
+    [meals, weekPlan] = await Promise.all([getMeals(), getWeekPlan(weekStartISO)]);
+  } catch (err) {
+    return (
+      <>
+        <PageHeader
+          title="Meal Planner 🍽️"
+          description="Plan the week's dinners, build a shopping list, and keep your family favorites."
+        />
+        <DbError message={err instanceof Error ? err.message : undefined} />
+      </>
+    );
+  }
 
   const week = weekPlan.map((d) => ({ date: d.date, meal: d.meal }));
 

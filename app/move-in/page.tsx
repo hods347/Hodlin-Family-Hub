@@ -1,4 +1,4 @@
-import { PageHeader, EmptyState, DbNotConfigured } from "@/components/ui";
+import { PageHeader, EmptyState, DbNotConfigured, DbError } from "@/components/ui";
 import { isDbConfigured } from "@/lib/db";
 import { MoveInClient } from "@/components/move-in/move-in-client";
 import { getMoveTasks, loadDefaultMoveTasks } from "./actions";
@@ -18,7 +18,20 @@ export default async function MoveInPage() {
     );
   }
 
-  const tasks = await getMoveTasks();
+  let tasks;
+  try {
+    tasks = await getMoveTasks();
+  } catch (err) {
+    return (
+      <>
+        <PageHeader
+          title="Move-In Prep 📦"
+          description="Everything to get the new house ready — utilities, safety, unpacking, and more."
+        />
+        <DbError message={err instanceof Error ? err.message : undefined} />
+      </>
+    );
+  }
 
   return (
     <>

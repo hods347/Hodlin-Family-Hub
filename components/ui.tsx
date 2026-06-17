@@ -96,3 +96,32 @@ export function DbNotConfigured() {
     </Card>
   );
 }
+
+/**
+ * Shown when a database query fails at runtime (e.g. tables not created yet, or
+ * a bad connection string) so pages degrade gracefully instead of crashing.
+ */
+export function DbError({ message }: { message?: string }) {
+  return (
+    <Card className="border-red-200 bg-red-50 p-6">
+      <h3 className="flex items-center gap-2 font-semibold text-red-900">
+        <span>⚠️</span> Couldn&apos;t load your data
+      </h3>
+      <p className="mt-2 text-sm text-red-800">
+        The app reached the database but the query failed. The most common cause is that
+        the tables haven&apos;t been created yet. Run{" "}
+        <code className="rounded bg-red-100 px-1">npm run db:push</code> (or apply{" "}
+        <code className="rounded bg-red-100 px-1">drizzle/0000_lush_hardball.sql</code> in the
+        Neon SQL editor), then reload. If you just set{" "}
+        <code className="rounded bg-red-100 px-1">DATABASE_URL</code>, redeploy so it takes
+        effect. See the README for setup.
+      </p>
+      {message && (
+        <pre className="mt-3 overflow-x-auto rounded bg-red-100 p-2 text-xs text-red-900">
+          {message}
+        </pre>
+      )}
+    </Card>
+  );
+}
+
