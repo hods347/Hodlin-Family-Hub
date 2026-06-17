@@ -1,4 +1,4 @@
-import { PageHeader, EmptyState, DbNotConfigured } from "@/components/ui";
+import { PageHeader, EmptyState, DbNotConfigured, DbError } from "@/components/ui";
 import { isDbConfigured } from "@/lib/db";
 import { BabyClient } from "@/components/baby/baby-client";
 import { getChildren, getTemplatesWithBlocks } from "./actions";
@@ -18,10 +18,20 @@ export default async function BabyPage() {
     );
   }
 
-  const [children, templates] = await Promise.all([
-    getChildren(),
-    getTemplatesWithBlocks(),
-  ]);
+  let children, templates;
+  try {
+    [children, templates] = await Promise.all([
+      getChildren(),
+      getTemplatesWithBlocks(),
+    ]);
+  } catch (err) {
+    return (
+      <>
+        <PageHeader title="Baby Scheduler 🍼" description={DESCRIPTION} />
+        <DbError message={err instanceof Error ? err.message : undefined} />
+      </>
+    );
+  }
 
   return (
     <>

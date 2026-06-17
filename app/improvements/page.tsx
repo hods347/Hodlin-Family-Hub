@@ -1,4 +1,4 @@
-import { PageHeader, EmptyState, DbNotConfigured } from "@/components/ui";
+import { PageHeader, EmptyState, DbNotConfigured, DbError } from "@/components/ui";
 import { isDbConfigured } from "@/lib/db";
 import { ImprovementsClient } from "@/components/improvements/improvements-client";
 import { getProjects, addProject } from "./actions";
@@ -18,7 +18,17 @@ export default async function ImprovementsPage() {
     );
   }
 
-  const projects = await getProjects();
+  let projects;
+  try {
+    projects = await getProjects();
+  } catch (err) {
+    return (
+      <>
+        <PageHeader title="Home Projects 🛠️" description={DESCRIPTION} />
+        <DbError message={err instanceof Error ? err.message : undefined} />
+      </>
+    );
+  }
 
   return (
     <>
