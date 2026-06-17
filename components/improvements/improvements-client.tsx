@@ -266,14 +266,17 @@ export function ImprovementsClient({ projects }: { projects: ImprovementProject[
           >
             <p className="text-sm text-muted">
               Paste items from your inspection report, one per line. Each becomes a
-              project tagged{" "}
-              <Badge variant="inspection">inspection</Badge>.
+              project tagged <Badge variant="inspection">inspection</Badge>. To set
+              priority and cost, use{" "}
+              <code className="rounded bg-border/40 px-1">Title | priority | cost | area</code>{" "}
+              — priority is one of urgent/high/medium/low, and the trailing fields
+              are optional (a plain title still works).
             </p>
             <textarea
               name="items"
               required
               rows={8}
-              placeholder={"Repair loose deck railing\nReplace furnace filter\nRegrade soil away from foundation"}
+              placeholder={"Replace heating systems before heating season | urgent | 12000 | Heating\nFix gutter/downspout drainage | high | 2500 | Gutters\nRegrade soil away from foundation | low | 1000 | Grounds"}
               className="w-full rounded-lg border border-border px-3 py-2 text-sm"
             />
             <button

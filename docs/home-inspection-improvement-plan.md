@@ -130,37 +130,41 @@ candidates for **seller credit / price negotiation** given the Defective ratings
 
 ## Bulk-import list (for the Home Projects planner)
 
-Paste the block below into **🛠️ Home Projects → "Paste inspection-report items"**.
-One project per line; set priority/cost/date per the tables above after import.
+Paste the block below into **🛠️ Home Projects → "📋 Import inspection items"**.
+The importer accepts a `Title | priority | cost | area` format (priority =
+urgent/high/medium/low; trailing fields optional), so this loads priority and
+cost along with each item. Set target dates per the tables above after import.
 
 ```
-Replace heating systems (2 old Armstrong gas furnaces) — prior to heating season
-Replace A/C systems (2 units past life cycle) — with HVAC
-Replace gas water heater (bundle with HVAC)
-Clean ductwork during HVAC replacement
-Replace faulty GFCI at kitchen sink + secure outside conduits & A/C disconnect
-Add generator safety disconnect/interlock at panel
-Evaluate electrical panel (full, no expansion room) — possible upgrade
-Replace garage door openers with modern safety eyes (2 doors)
-Add fire-rated door between garage and house
-Repair rotted rear kitchen bay siding + interior lower wall (immediate)
-Repair loose guardrail post (open floor before new flooring)
-Repair/rebuild rotted upper rear deck flooring and steps
-Lift settled front/rear concrete walkways (trip hazard)
-Clean dryer vent
-Clean and inspect fireplace flues top-down
-Replace/repair ~35% rotted wood siding, front dormers & corner boards — get estimates
-Fix gutter/downspout drainage; divert downspouts away from house
-Repair pool-house pump leak and rotted wood siding
-Replace fogged/failed window seals
-Winterize pool-house plumbing each fall
-Add basement window wells and run dehumidifier in humid months
-Add foundation shrubs/grading and cut back overgrown shrubs
-Monitor front stoop settling
-Remove soft rear ground-level deck
-Re-stretch wrinkled carpets
-Ask sellers: basement water history, kitchen/garage ceiling stains, chimney records
-Confirm well water test and radon results
+Ask sellers: basement water history, kitchen/garage ceiling stains, chimney records | urgent | | Due diligence
+Confirm well water test and radon results | high | 500 | Due diligence
+Replace heating systems (2 old Armstrong gas furnaces) before heating season | urgent | 12000 | Heating
+Replace A/C systems (2 units past life cycle) with HVAC | urgent | 12000 | Air Conditioning
+Replace gas water heater (bundle with HVAC) | high | 2000 | Hot Water
+Clean ductwork during HVAC replacement | medium | 700 | HVAC
+Replace faulty GFCI at kitchen sink; secure outside conduits & A/C disconnect | high | 1200 | Electrical
+Add generator safety disconnect/interlock at panel | high | 1000 | Electrical
+Evaluate electrical panel (full, no expansion) — possible upgrade | medium | 2500 | Electrical
+Replace 2 garage door openers with modern safety eyes | high | 800 | Garage
+Add fire-rated door between garage and house | high | 500 | Garage
+Repair rotted rear kitchen bay siding + interior lower wall (immediate) | urgent | 4500 | Siding
+Repair loose guardrail post (open floor before new flooring) | high | 500 | Stairs
+Repair/rebuild rotted upper rear deck flooring and steps | high | 4000 | Decks
+Lift settled front/rear concrete walkways (trip hazard) | medium | 1200 | Walkways
+Clean dryer vent | medium | 150 | Laundry
+Clean and inspect fireplace flues top-down | medium | 450 | Fireplace
+Replace ~35% rotted wood siding, front dormers & corner boards — get estimates | high | 20000 | Siding
+Fix gutter/downspout drainage; divert downspouts away from house | high | 2500 | Gutters
+Repair pool-house pump leak and rotted wood siding | medium | 2000 | Pool House
+Replace fogged/failed window seals | medium | 1500 | Windows
+Winterize pool-house plumbing each fall | low | 150 | Pool House
+Run basement dehumidifier in humid months | low | 300 | Basement
+Add basement window wells | low | 800 | Grounds
+Add foundation shrubs and grade soil away from foundation | low | 1000 | Grounds
+Cut back overgrown shrubs | low | 400 | Grounds
+Monitor front stoop settling | low | | Decks
+Remove soft rear ground-level deck | low | 1000 | Decks
+Re-stretch wrinkled carpets | low | 300 | Interior
 ```
 
 ---
