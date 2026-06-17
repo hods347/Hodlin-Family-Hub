@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import type { ImprovementProject } from "@/lib/db/schema";
 import { Badge, Card } from "@/components/ui";
 import { formatDate, formatMoney, cn } from "@/lib/utils";
@@ -10,16 +10,10 @@ import {
   updateProject,
   updateProjectStatus,
   updateProjectPriority,
+  reorderProjects,
+  sortProjectsByPriority,
   deleteProject,
 } from "@/app/improvements/actions";
-
-/** Rank used to sort by priority (higher = more urgent). */
-const PRIORITY_RANK: Record<string, number> = {
-  urgent: 3,
-  high: 2,
-  medium: 1,
-  low: 0,
-};
 
 const PRIORITIES = ["urgent", "high", "medium", "low"] as const;
 const STATUSES = ["not_started", "in_progress", "done"] as const;
@@ -73,9 +67,22 @@ function googleCalendarUrl(project: ImprovementProject): string {
 
 export function ImprovementsClient({ projects }: { projects: ImprovementProject[] }) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [sortByPriority, setSortByPriority] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  // Local copy so drag reordering feels instant; resynced whenever the server
+  // sends a fresh list (after add / import / sort / reorder). Adjusting state
+  // during render — tracking the previous prop in state — is React's
+  // recommended way to react to a changed prop without an effect.
+  const [items, setItems] = useState(projects);
+  const [syncedFrom, setSyncedFrom] = useState(projects);
+  if (syncedFrom !== projects) {
+    setSyncedFrom(projects);
+    setItems(projects);
+  }
+
+  const dragIndex = useRef<number | null>(null);
 
   const counts = useMemo(() => {
     const byStatus: Record<string, number> = {
@@ -85,23 +92,42 @@ export function ImprovementsClient({ projects }: { projects: ImprovementProject[
     };
     let totalCost = 0;
     let inspectionCount = 0;
-    for (const p of projects) {
+    for (const p of items) {
       byStatus[p.status] = (byStatus[p.status] ?? 0) + 1;
       totalCost += p.estimatedCost ?? 0;
       if (p.source === "inspection") inspectionCount += 1;
     }
     return { byStatus, totalCost, inspectionCount };
-  }, [projects]);
+  }, [items]);
 
-  const visible = useMemo(() => {
-    let list = projects.filter((p) => statusFilter === "all" || p.status === statusFilter);
-    if (sortByPriority) {
-      list = [...list].sort(
-        (a, b) => (PRIORITY_RANK[b.priority] ?? 0) - (PRIORITY_RANK[a.priority] ?? 0),
-      );
-    }
-    return list;
-  }, [projects, statusFilter, sortByPriority]);
+  // Drag reordering only makes sense over the full, unfiltered list so indices
+  // line up with what's persisted.
+  const canReorder = statusFilter === "all";
+  const visible = useMemo(
+    () => items.filter((p) => statusFilter === "all" || p.status === statusFilter),
+    [items, statusFilter],
+  );
+
+  function handleDragStart(index: number) {
+    dragIndex.current = index;
+  }
+
+  function handleDragEnter(index: number) {
+    const from = dragIndex.current;
+    if (from === null || from === index) return;
+    setItems((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(index, 0, moved);
+      return next;
+    });
+    dragIndex.current = index;
+  }
+
+  function handleDragEnd() {
+    dragIndex.current = null;
+    startTransition(() => reorderProjects(items.map((p) => p.id)));
+  }
 
   return (
     <div className="space-y-6">
@@ -147,13 +173,12 @@ export function ImprovementsClient({ projects }: { projects: ImprovementProject[
           ))}
         </div>
         <button
-          onClick={() => setSortByPriority((v) => !v)}
-          className={cn(
-            "rounded-lg border border-border px-3 py-2 text-sm",
-            sortByPriority ? "bg-accent text-white" : "bg-card hover:bg-black/5",
-          )}
+          onClick={() => startTransition(() => sortProjectsByPriority())}
+          disabled={isPending}
+          className="rounded-lg border border-border bg-card px-3 py-2 text-sm hover:bg-black/5 disabled:opacity-50"
+          title="Reorder all projects by priority (urgent → low)"
         >
-          {sortByPriority ? "✓ Sorted by priority" : "Sort by priority"}
+          ↓ Sort by priority
         </button>
         <div className="ml-auto flex gap-2">
           <button
@@ -294,17 +319,44 @@ export function ImprovementsClient({ projects }: { projects: ImprovementProject[
       {visible.length === 0 ? (
         <p className="py-10 text-center text-muted">No projects match this filter.</p>
       ) : (
-        <Card className="divide-y divide-border">
-          {visible.map((project) => (
-            <ProjectRow key={project.id} project={project} />
-          ))}
-        </Card>
+        <>
+          {!canReorder && (
+            <p className="text-xs text-muted">
+              Showing a filtered view — switch to <strong>All</strong> to drag and
+              reorder projects.
+            </p>
+          )}
+          <Card className="divide-y divide-border">
+            {visible.map((project, index) => (
+              <ProjectRow
+                key={project.id}
+                project={project}
+                draggable={canReorder}
+                onDragStart={() => handleDragStart(index)}
+                onDragEnter={() => handleDragEnter(index)}
+                onDragEnd={handleDragEnd}
+              />
+            ))}
+          </Card>
+        </>
       )}
     </div>
   );
 }
 
-function ProjectRow({ project }: { project: ImprovementProject }) {
+function ProjectRow({
+  project,
+  draggable = false,
+  onDragStart,
+  onDragEnter,
+  onDragEnd,
+}: {
+  project: ImprovementProject;
+  draggable?: boolean;
+  onDragStart?: () => void;
+  onDragEnter?: () => void;
+  onDragEnd?: () => void;
+}) {
   const [, startTransition] = useTransition();
   const [isEditing, setIsEditing] = useState(false);
   const calUrl = googleCalendarUrl(project);
@@ -405,7 +457,23 @@ function ProjectRow({ project }: { project: ImprovementProject }) {
   }
 
   return (
-    <div className="flex items-start gap-3 p-4">
+    <div
+      draggable={draggable}
+      onDragStart={onDragStart}
+      onDragEnter={onDragEnter}
+      onDragEnd={onDragEnd}
+      onDragOver={(e) => draggable && e.preventDefault()}
+      className={cn("flex items-start gap-2 p-4", draggable && "cursor-grab active:cursor-grabbing")}
+    >
+      {draggable && (
+        <span
+          className="select-none pt-0.5 text-muted"
+          aria-hidden
+          title="Drag to reorder"
+        >
+          ⠿
+        </span>
+      )}
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <span
