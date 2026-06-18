@@ -189,10 +189,15 @@ export async function importInspectionItems(formData: FormData) {
  */
 export async function reorderProjects(orderedIds: number[]) {
   const db = getDb();
-  if (orderedIds.length === 0) return;
+  // Guard against bad input and ensure plain integers for the SQL below.
+  const ids = orderedIds.map(Number).filter(Number.isInteger);
+  if (ids.length === 0) return;
 
+  // Build `case id when <id> then <index> ... end`. The `::int` casts are
+  // required: without them every branch is an untyped bind parameter and
+  // Postgres can't determine the CASE result type.
   const cases = sql.join(
-    orderedIds.map((id, i) => sql`when ${id} then ${i}`),
+    ids.map((id, i) => sql`when ${id}::int then ${i}::int`),
     sql` `,
   );
   await db
@@ -201,7 +206,7 @@ export async function reorderProjects(orderedIds: number[]) {
       sortOrder: sql`case ${improvementProjects.id} ${cases} end`,
       updatedAt: new Date(),
     })
-    .where(inArray(improvementProjects.id, orderedIds));
+    .where(inArray(improvementProjects.id, ids));
   revalidatePath("/improvements");
   revalidatePath("/");
 }
