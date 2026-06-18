@@ -1,16 +1,24 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq, desc } from "drizzle-orm";
+import { eq, asc, inArray, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { improvementProjects } from "@/lib/db/schema";
+
+/** Rank used when (re)sorting by priority — higher = more urgent. */
+const PRIORITY_RANK: Record<string, number> = {
+  urgent: 3,
+  high: 2,
+  medium: 1,
+  low: 0,
+};
 
 export async function getProjects() {
   const db = getDb();
   return db
     .select()
     .from(improvementProjects)
-    .orderBy(desc(improvementProjects.createdAt));
+    .orderBy(asc(improvementProjects.sortOrder), asc(improvementProjects.id));
 }
 
 function parseIntOrNull(value: FormDataEntryValue | null): number | null {
@@ -18,6 +26,16 @@ function parseIntOrNull(value: FormDataEntryValue | null): number | null {
   if (!raw) return null;
   const n = parseInt(raw, 10);
   return Number.isNaN(n) ? null : n;
+}
+
+/** Returns the next sort_order value so new rows append to the end of the list. */
+async function nextSortOrder(
+  db: ReturnType<typeof getDb>,
+): Promise<number> {
+  const [row] = await db
+    .select({ max: sql<number>`coalesce(max(${improvementProjects.sortOrder}), -1)` })
+    .from(improvementProjects);
+  return Number(row?.max ?? -1) + 1;
 }
 
 export async function addProject(formData: FormData) {
@@ -44,6 +62,7 @@ export async function addProject(formData: FormData) {
     estimatedCost,
     estimatedHours,
     targetDate,
+    sortOrder: await nextSortOrder(db),
   });
   revalidatePath("/improvements");
   revalidatePath("/");
@@ -152,7 +171,59 @@ export async function importInspectionItems(formData: FormData) {
     .filter((row): row is NonNullable<typeof row> => row !== null);
   if (rows.length === 0) return;
 
-  await db.insert(improvementProjects).values(rows);
+  // Land the imported batch already sorted by priority, appended after any
+  // existing projects. The user can then drag individual items to fine-tune.
+  const start = await nextSortOrder(db);
+  rows.sort((a, b) => (PRIORITY_RANK[b.priority] ?? 0) - (PRIORITY_RANK[a.priority] ?? 0));
+
+  await db.insert(improvementProjects).values(
+    rows.map((row, i) => ({ ...row, sortOrder: start + i })),
+  );
   revalidatePath("/improvements");
   revalidatePath("/");
+}
+
+/**
+ * Persist a new manual order. `orderedIds` is the full list of project ids in
+ * the desired top-to-bottom order; each row's sort_order is set to its index.
+ */
+export async function reorderProjects(orderedIds: number[]) {
+  const db = getDb();
+  if (orderedIds.length === 0) return;
+
+  const cases = sql.join(
+    orderedIds.map((id, i) => sql`when ${id} then ${i}`),
+    sql` `,
+  );
+  await db
+    .update(improvementProjects)
+    .set({
+      sortOrder: sql`case ${improvementProjects.id} ${cases} end`,
+      updatedAt: new Date(),
+    })
+    .where(inArray(improvementProjects.id, orderedIds));
+  revalidatePath("/improvements");
+  revalidatePath("/");
+}
+
+/** Reorder every project by priority (urgent → low) and persist the result. */
+export async function sortProjectsByPriority() {
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: improvementProjects.id,
+      priority: improvementProjects.priority,
+      sortOrder: improvementProjects.sortOrder,
+    })
+    .from(improvementProjects);
+
+  const ordered = rows
+    .sort(
+      (a, b) =>
+        (PRIORITY_RANK[b.priority] ?? 0) - (PRIORITY_RANK[a.priority] ?? 0) ||
+        a.sortOrder - b.sortOrder,
+    )
+    .map((r) => r.id);
+
+  await reorderProjects(ordered);
 }

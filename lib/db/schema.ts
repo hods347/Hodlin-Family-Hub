@@ -79,6 +79,7 @@ export const improvementProjects = pgTable("improvement_projects", {
   estimatedCost: integer("estimated_cost"),
   estimatedHours: integer("estimated_hours"),
   targetDate: date("target_date"),
+  sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
