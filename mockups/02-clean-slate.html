@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hodlin Family Hub — Clean Slate</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --ink: #0f172a; --muted: #64748b; --line: #e9edf3; --accent: #4f46e5; --bg: #ffffff; --soft: #f8fafc; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  a { text-decoration: none; color: inherit; }
+  .back { position: fixed; top: 16px; right: 18px; z-index: 30; font-size: 13px; font-weight: 600;
+    background: #fff; border: 1px solid var(--line); padding: 7px 13px; border-radius: 8px; color: var(--muted); box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+
+  .shell { display: grid; grid-template-columns: 256px 1fr; min-height: 100vh; }
+  /* sidebar */
+  aside { border-right: 1px solid var(--line); padding: 26px 18px; position: sticky; top: 0; height: 100vh; background: var(--soft); }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; font-size: 16px; padding: 0 8px 24px; }
+  .brand .logo { width: 34px; height: 34px; border-radius: 9px; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 17px; }
+  nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 9px; font-size: 14.5px; font-weight: 500; color: var(--muted); margin-bottom: 3px; }
+  nav a .e { width: 20px; text-align: center; }
+  nav a.active { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.06); border: 1px solid var(--line); }
+  nav a:hover:not(.active) { background: #eef1f6; color: var(--ink); }
+  .side-foot { position: absolute; bottom: 24px; left: 18px; right: 18px; font-size: 12.5px; color: #94a3b8; padding: 0 8px; }
+  @media (max-width: 760px) { .shell { grid-template-columns: 1fr; } aside { display: none; } }
+
+  main { padding: 48px 56px 80px; max-width: 980px; }
+  @media (max-width: 760px) { main { padding: 32px 22px 70px; } }
+  .crumb { font-size: 13px; color: var(--muted); font-weight: 500; }
+  h1 { font-size: 32px; font-weight: 700; letter-spacing: -.02em; margin-top: 6px; }
+  .lead { color: var(--muted); margin-top: 8px; font-size: 15.5px; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 36px; }
+  @media (max-width: 600px) { .stats { grid-template-columns: 1fr; } }
+  .stat { border: 1px solid var(--line); border-radius: 14px; padding: 22px; background: #fff; }
+  .stat .k { font-size: 13px; color: var(--muted); font-weight: 500; display: flex; align-items: center; gap: 8px; }
+  .stat .v { font-size: 30px; font-weight: 700; margin-top: 10px; letter-spacing: -.02em; }
+  .stat .d { font-size: 13.5px; color: var(--muted); margin-top: 4px; }
+  .pill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #eef2ff; color: var(--accent); }
+  .track { height: 7px; background: #eef1f6; border-radius: 99px; margin-top: 14px; overflow: hidden; }
+  .track > i { display: block; height: 100%; width: 62%; background: var(--accent); }
+
+  .h2 { font-size: 14px; font-weight: 600; color: var(--muted); margin: 44px 0 16px; letter-spacing: .01em; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .cards { grid-template-columns: 1fr; } }
+  .c { border: 1px solid var(--line); border-radius: 14px; padding: 22px; background: #fff; transition: border-color .15s, box-shadow .15s, transform .15s; }
+  .c:hover { border-color: #cdd5e2; box-shadow: 0 8px 24px rgba(15,23,42,.07); transform: translateY(-2px); }
+  .c .top { display: flex; align-items: center; justify-content: space-between; }
+  .c .e { width: 40px; height: 40px; border-radius: 10px; background: var(--soft); border: 1px solid var(--line); display: grid; place-items: center; font-size: 20px; }
+  .c .chev { color: #cbd5e1; font-size: 20px; }
+  .c h3 { font-size: 16.5px; font-weight: 600; margin-top: 16px; }
+  .c p { color: var(--muted); font-size: 13.5px; margin-top: 5px; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <a class="back" href="index.html">← All mockups</a>
+  <div class="shell">
+    <aside>
+      <div class="brand"><span class="logo">H</span> Family Hub</div>
+      <nav>
+        <a class="active" href="#"><span class="e">▦</span> Dashboard</a>
+        <a href="#"><span class="e">📦</span> Move-In Prep</a>
+        <a href="#"><span class="e">🛠️</span> Home Projects</a>
+        <a href="#"><span class="e">🍽️</span> Meal Planner</a>
+        <a href="#"><span class="e">🍼</span> Baby Scheduler</a>
+      </nav>
+      <div class="side-foot">The Hodlins · private home base</div>
+    </aside>
+
+    <main>
+      <div class="crumb">Home</div>
+      <h1>Welcome home, Hodlins</h1>
+      <p class="lead">Your family's home base. Pick up where you left off.</p>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="k">🍼 Baby #2 due <span class="pill">Countdown</span></div>
+          <div class="v">83 days</div>
+          <div class="d">September 9, 2026</div>
+        </div>
+        <div class="stat">
+          <div class="k">📦 Move-in progress <span class="pill">31 / 50</span></div>
+          <div class="v">62%</div>
+          <div class="track"><i></i></div>
+        </div>
+      </div>
+
+      <div class="h2">Features</div>
+      <div class="cards">
+        <a class="c" href="#"><div class="top"><div class="e">📦</div><div class="chev">›</div></div><h3>Move-In Prep</h3><p>Everything to do for the new house — check it off as you go.</p></a>
+        <a class="c" href="#"><div class="top"><div class="e">🛠️</div><div class="chev">›</div></div><h3>Home Projects</h3><p>Inspection items & upgrades with priority, cost, and calendar reminders.</p></a>
+        <a class="c" href="#"><div class="top"><div class="e">🍽️</div><div class="chev">›</div></div><h3>Meal Planner</h3><p>Build a weekly plan from your favorite meals.</p></a>
+        <a class="c" href="#"><div class="top"><div class="e">🍼</div><div class="chev">›</div></div><h3>Baby Scheduler</h3><p>Sleep & feeding schedules to hand off to babysitters.</p></a>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
