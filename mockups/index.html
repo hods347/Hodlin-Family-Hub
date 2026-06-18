@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hodlin Family Hub — Design Mockups</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f1ea;
+    color: #1f2430;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 64px 24px 80px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #b45309; }
+  h1 { font-size: 40px; font-weight: 800; letter-spacing: -.02em; margin-top: 8px; }
+  .sub { color: #6b7280; margin-top: 12px; font-size: 17px; max-width: 560px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; margin-top: 48px; }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+  .card {
+    display: block; text-decoration: none; color: inherit;
+    border-radius: 20px; overflow: hidden; background: #fff;
+    border: 1px solid #e7e2d8; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(0,0,0,.12); }
+  .swatch { height: 150px; position: relative; }
+  .swatch .dots { position: absolute; bottom: 14px; left: 16px; display: flex; gap: 7px; }
+  .swatch .dots span { width: 18px; height: 18px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255,255,255,.55); }
+  .card-body { padding: 20px 22px 24px; }
+  .card-body h2 { font-size: 20px; font-weight: 700; }
+  .card-body p { color: #6b7280; font-size: 14.5px; margin-top: 6px; }
+  .open { margin-top: 14px; font-weight: 600; font-size: 14px; color: #b45309; display: inline-flex; align-items: center; gap: 6px; }
+  .footer { margin-top: 56px; color: #9ca3af; font-size: 13.5px; }
+
+  /* swatch backgrounds */
+  .s-hearth { background: linear-gradient(135deg, #fef3e2, #f6c89f 55%, #c2410c); }
+  .s-slate  { background: linear-gradient(135deg, #ffffff, #eef2ff 60%, #6366f1); }
+  .s-pop    { background: linear-gradient(120deg, #ff6ec7, #ffd86b 50%, #5ad1ff); }
+  .s-mid    { background: linear-gradient(135deg, #1e293b, #312e81 60%, #0f172a); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">🏡 Hodlin Family Hub</div>
+    <h1>Design mockups</h1>
+    <p class="sub">Four directions for the family hub dashboard. Each is a working, self-contained page — click in to explore the full look. Same content, different feel.</p>
+
+    <div class="grid">
+      <a class="card" href="01-warm-hearth.html">
+        <div class="swatch s-hearth"><div class="dots"><span style="background:#fef3e2"></span><span style="background:#f6c89f"></span><span style="background:#c2410c"></span></div></div>
+        <div class="card-body">
+          <h2>1 · Warm Hearth</h2>
+          <p>Cozy and inviting — warm creams, terracotta accents, soft rounded cards. A refined take on the current direction.</p>
+          <span class="open">Open mockup →</span>
+        </div>
+      </a>
+
+      <a class="card" href="02-clean-slate.html">
+        <div class="swatch s-slate"><div class="dots"><span style="background:#ffffff"></span><span style="background:#eef2ff"></span><span style="background:#6366f1"></span></div></div>
+        <div class="card-body">
+          <h2>2 · Clean Slate</h2>
+          <p>Modern and minimal — generous whitespace, a sidebar, crisp typography, and a single indigo accent.</p>
+          <span class="open">Open mockup →</span>
+        </div>
+      </a>
+
+      <a class="card" href="03-playful-pop.html">
+        <div class="swatch s-pop"><div class="dots"><span style="background:#ff6ec7"></span><span style="background:#ffd86b"></span><span style="background:#5ad1ff"></span></div></div>
+        <div class="card-body">
+          <h2>3 · Playful Pop</h2>
+          <p>Bright and friendly — bold gradients, big playful shapes, and lots of personality for a family space.</p>
+          <span class="open">Open mockup →</span>
+        </div>
+      </a>
+
+      <a class="card" href="04-midnight.html">
+        <div class="swatch s-mid"><div class="dots"><span style="background:#1e293b"></span><span style="background:#6366f1"></span><span style="background:#0f172a"></span></div></div>
+        <div class="card-body">
+          <h2>4 · Midnight</h2>
+          <p>Sleek and premium — a dark, focused interface with glowing accents and high contrast.</p>
+          <span class="open">Open mockup →</span>
+        </div>
+      </a>
+    </div>
+
+    <p class="footer">Mockups only — these are static previews of the dashboard. Pick a direction (or mix elements) and it'll be built into the live Next.js app.</p>
+  </div>
+</body>
+</html>
