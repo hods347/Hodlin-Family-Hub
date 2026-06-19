@@ -36,4 +36,11 @@ export const NAV_ITEMS: NavItem[] = [
     description: "Sleep & feeding schedules to hand off to babysitters.",
     accent: "from-pink-500 to-rose-500",
   },
+  {
+    name: "Trusted Contractors",
+    href: "/contractors",
+    emoji: "🧰",
+    description: "Vetted pros for the house — well, carpentry, landscaping, and more.",
+    accent: "from-sky-500 to-cyan-500",
+  },
 ];
