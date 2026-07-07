@@ -29,4 +29,14 @@ export const CONTRACTORS: Contractor[] = [
     website: "https://h2ocare.com",
     address: "18 Lonergan Rd, Middleton, MA 01949",
   },
+  {
+    name: "Sean Donohoe",
+    category: "Flooring",
+    description:
+      "Footprints Floors of Central MA — hardwood, LVP, tile, refinishing, and carpet removal.",
+    phone: "(508) 422-4545",
+    email: "sdonohoe@footprintsfloors.com",
+    website: "https://footprintsfloors.com/central-mass",
+    address: "156 Northgate Rd, Northborough, MA 01532",
+  },
 ];
